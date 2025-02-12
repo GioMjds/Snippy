@@ -2,6 +2,7 @@ require('dotenv').config();
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import { connectDB } from './config/db';
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(cors({
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json({ message: "Hello Express.js!" });
 });
+
+connectDB();
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port http://localhost:${process.env.PORT}`);
