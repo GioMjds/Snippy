@@ -1,8 +1,17 @@
 import axios from "axios";
+import { apiUrl } from "../constants/env";
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: apiUrl,
     withCredentials: true
 });
 
-export default API;
+export const handleLogin = async (email: string, password: string) => {
+    try {
+        const response = await API.post('/users/login', { email, password });
+        return response.data;
+    } catch (error) {
+        console.error(`Error during login: ${error}`);
+        throw error;
+    }
+};

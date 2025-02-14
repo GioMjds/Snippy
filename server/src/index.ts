@@ -1,20 +1,20 @@
 require('dotenv').config();
-import express, { Request, Response } from 'express';
+import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { connectDB } from './config/db';
+import usersRoutes from "./routes/usersRoutes";
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true
 }));
 
-app.get('/', (req: Request, res: Response) => {
-    res.status(200).json({ message: "Hello Express.js!" });
-});
+app.use('/users', usersRoutes);
 
 connectDB();
 

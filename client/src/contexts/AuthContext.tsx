@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useContext, FC, ReactNode } from "react";
 
@@ -16,18 +17,21 @@ interface UserSignUp {
 
 interface UserContextType {
     isAuthenticated: boolean;
-    setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
     userDetails: UserDetails | null;
-    setUserDetails: React.Dispatch<React.SetStateAction<UserDetails | null>>;
     userSignUp: UserSignUp;
-    setUserSignUp: React.Dispatch<React.SetStateAction<UserSignUp>>;
+    sessionExpired: boolean;
+    setIsAuthenticated: (value: boolean) => void;
+    setUserDetails: (value: UserDetails) => void;
+    setUserSignUp: (value: UserSignUp) => void;
+    setSessionExpired: (value: boolean) => void;
 }
 
-export const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | any>(null);
 
 export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+    const [sessionExpired, setSessionExpired] = useState<boolean>(false);
     const [userSignUp, setUserSignUp] = useState<UserSignUp>({
         username: '',
         email: '',
@@ -42,6 +46,8 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
         setUserDetails,
         userSignUp,
         setUserSignUp,
+        sessionExpired,
+        setSessionExpired,
     };
 
     return (
