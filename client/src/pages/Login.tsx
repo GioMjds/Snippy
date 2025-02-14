@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
+import loginBackground from '../assets/layered-waves-haikei.png';
 
 const Login: FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -23,7 +24,12 @@ const Login: FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    navigate('/feed');
     setLoading(true);
+    setErrors((prev) => ({
+      ...prev,
+      email: '',
+    }));
   }
 
   return (
@@ -31,43 +37,47 @@ const Login: FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative min-h-screen bg-gray-100 flex items-center justify-center"
+      className="relative min-h-screen bg-gray-100 flex items-center justify-center bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${loginBackground})` }}
     >
       <div className="container mx-auto px-6 py-12 h-full">
         <div className="flex justify-center items-center h-full gap-6 text-gray-800">
           <div className="space-y-4 md:space-y-6 md:w-8/12 lg:w-6/12 mb-12 md:mb-0">
-            <h1 className="text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight text-gray-800">
-              Welcome to Snippy!
+            <h1 className="text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight text-gray-300">
+              Welcome to <span className="text-indigo-500">Snippy!</span>
             </h1>
-            <p className="text-blue-600 font-semibold text-3xl">
-              The best place to share all of your snippets!
+            <p className="text-gray-400 font-semibold text-3xl">
+              The best place to share all of your code snippets!
             </p>
           </div>
           <div className="md:w-8/12 lg:w-5/12 lg:ml-20">
-            <h1 className="text-5xl font-bold my-4 text-center">Login</h1>
+            <h1 className="text-5xl font-bold my-8 text-center text-gray-300">Login</h1>
             <div className="block rounded-lg shadow-lg bg-white p-8 md:py-12 md:mx-12">
               <form onSubmit={handleSubmit}
                 className="min-w-full space-y-4 md:space-y-6"
               >
                 <div className="mb-4">
-                  <label htmlFor="email" className="block text-gray-700 text-xl font-medium mb-2">Your Email</label>
+                  <label htmlFor="email" className="block text-gray-700 text-xl font-bold mb-2">Your Email</label>
                   <input
                     type="email"
                     name="email"
+                    id="email"
                     value={email}
                     onChange={handleEmailChange}
                     placeholder="name@email.com"
                     className="block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition duration-200 ease-in-out m-0 focus:text-gray-700 focus:outline-none"
                     aria-required="true"
+                    autoComplete="on"
                     required
                   />
                   {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
                 <div className="mb-4 relative">
-                  <label htmlFor="email" className="block text-gray-700 text-xl font-medium mb-2">Your Password</label>
+                  <label htmlFor="email" className="block text-gray-700 text-xl font-bold mb-2">Your Password</label>
                   <input
                     type={passwordVisible ? 'text' : 'password'}
                     name="password"
+                    id="password"
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Enter your password"
@@ -93,10 +103,10 @@ const Login: FC = () => {
                   >
                     {loading ? 'Loading...' : 'Login'}
                   </button>
-                  <div className="">
+                  <div className="flex justify-center items-center mt-4">
                     <Link to='/forgot-password' className="font-medium text-blue-600 hover:text-blue-700 focus:text-blue-700 transition duration-200 ease-in-out">Forgot Password?</Link>
                   </div>
-                  <p className="text-xl font-semibold mt-2 pt-1 mb-0">Don't have an account? <Link to='/signup' className="text-blue-600 hover:text-blue-700 focus:text-blue-700 transition duration-200 ease-in-out">Sign Up</Link></p>
+                  <p className="text-xl font-semibold mt-2 pt-1 mb-0">Don't have an account? <Link to='/register' className="text-blue-600 hover:text-blue-700 focus:text-blue-700 transition duration-200 ease-in-out">Sign Up</Link></p>
                 </div>
               </form>
             </div>
