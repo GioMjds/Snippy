@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@layer utilities {
+    .font-coolvetica {
+        font-family: 'Coolvetica', sans-serif;
+    }
+}
