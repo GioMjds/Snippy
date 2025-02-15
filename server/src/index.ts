@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { connectDB } from './config/db';
 import usersRoutes from "./routes/usersRoutes";
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(cors({
 }));
 
 app.use('/users', usersRoutes);
+app.use('/auth', authRoutes)
 
 connectDB();
 

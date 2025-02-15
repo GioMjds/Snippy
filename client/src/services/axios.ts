@@ -22,3 +22,18 @@ export const handleLogin = async (email: string, password: string) => {
         throw error;
     }
 };
+
+export const getGitHubUserData = async () => {
+    try {
+        const response = await API.get('/auth/getUserData', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+            }
+        });
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.error(`Error getting user data: ${error}`);
+        throw error;
+    }
+};

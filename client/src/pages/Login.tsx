@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import loginBackground from '../assets/layered-waves-haikei.png';
 import GoogleButton from "../components/buttons/GoogleButton";
 import GitHubButton from "../components/buttons/GitHubButton";
+// import { githubOauthUser } from "../constants/env";
 
 const Login: FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -32,14 +33,23 @@ const Login: FC = () => {
       ...prev,
       email: '',
     }));
-  }
+  };
+
+  // const handleGoogleLogin = async () => {
+  //   // Implement Google login
+  // }
+
+  // const handleGitHubLogin = async () => {
+  //   // Implement GitHub login
+  //   window.location.assign(`${githubOauthUser}`);
+  // }
 
   return (
     <section
       className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

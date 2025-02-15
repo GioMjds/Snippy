@@ -47,6 +47,14 @@ const Signup: FC = () => {
     if (hasErrors) return;
   }
 
+  // const handleGoogleSignup = async () => {
+  //   // Implement Google Signup
+  // }
+
+  // const handleGithubSignup = async () => {
+  //   // Implement GitHub Signup
+  // }
+
   return (
     <section
       className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"

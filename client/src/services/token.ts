@@ -1,7 +1,10 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { apiUrl } from "../constants/env";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const API = axios.create({
+    baseURL: apiUrl,
+});
 
 export const isTokenExpired = (token: string): boolean => {
     const decoded: { exp: number } = jwtDecode(token);
@@ -9,6 +12,27 @@ export const isTokenExpired = (token: string): boolean => {
     const currentTime = Date.now() / 1000;
     return tokenExpiration < currentTime;
 };
+
+export const getAccessToken = async (codeParam: string) => {
+    try {
+        const response = await API.get('/auth/getAccessToken', {
+            params: {
+                code: codeParam
+            }
+        });
+        console.log(response.data);
+        if (response.data.access_token) {
+            localStorage.setItem("access_token", response.data.access_token);
+            return response.data.access_token;
+        } else {
+            console.error("No access token received from server");
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error getting access token: ${error}`);
+        throw error;
+    }
+}
 
 export const refreshUserToken = async () => {
     const refreshToken = localStorage.getItem("refresh_token");
