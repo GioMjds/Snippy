@@ -1,13 +1,13 @@
-import { ChangeEvent, FC, FormEvent, useState } from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { motion } from "framer-motion";
+import { ChangeEvent, FC, FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import loginBackground from "../assets/layered-waves-haikei.png";
-import GoogleButton from "../components/buttons/GoogleButton";
-import GitHubButton from "../components/buttons/GitHubButton";
+import GitHubButton from "../components/oauth-buttons/GitHubButton";
+import GoogleButton from "../components/oauth-buttons/GoogleButton";
 import { validateEmail, validatePassword } from "../utils/validation";
-import { Link } from "react-router-dom";
 
 const Signup: FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -15,6 +15,7 @@ const Signup: FC = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [signUpError, setSignUpError] = useState(null);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -45,22 +46,28 @@ const Signup: FC = () => {
     if (passwordError) setErrors((prev) => ({ ...prev, password: passwordError }));
 
     if (hasErrors) return;
+  };
+
+  const handleGoogleSignupSuccess = (user: any, token: string) => {
+    setLoading(false);
+    setSignUpError(null);
+    localStorage.setItem('access_token', token);
+    console.log(`Google login success: ${user}`);
+    navigate('/profile/:userId');
+  };
+
+  const handleGoogleSignupError = (error: any) => {
+    setLoading(false);
+    setSignUpError(error);
+    console.error(`Google login error: ${error}`);
   }
-
-  // const handleGoogleSignup = async () => {
-  //   // Implement Google Signup
-  // }
-
-  // const handleGithubSignup = async () => {
-  //   // Implement GitHub Signup
-  // }
 
   return (
     <section
       className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -149,7 +156,11 @@ const Signup: FC = () => {
                   <div className="flex-grow border-t border-gray-300"></div>
                 </div>
                 <div className="flex justify-center gap-3">
-                  <GoogleButton text="Sign in using Google" />
+                  <GoogleButton 
+                    text="Sign in using Google" 
+                    onSuccessLogin={handleGoogleSignupSuccess}
+                    onErrorLogin={handleGoogleSignupError}
+                  />
                   <span className="text-xl text-white">or</span>
                   <GitHubButton text="Sign in using GitHub" />
                 </div>
@@ -158,9 +169,10 @@ const Signup: FC = () => {
                     type="submit"
                     className="inline-block px-7 py-3 text-lg leading-6 text-center text-white transition-colors duration-200 transform bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none"
                     disabled={loading}
-                >
+                  >
                     {loading ? 'Loading...' : 'Sign Up'}
                   </button>
+                  {signUpError && <p className="text-red-500 text-sm mt-1">{signUpError}</p>}
                   <p className="text-xl text-gray-300 mt-2 pt-1 mb-0">Already have an account? <Link to='/login' className="text-indigo-500 hover:text-indigo-600 focus:text-indigo-600 transition duration-200 ease-in-out">Login here</Link></p>
                 </div>
               </form>

@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Users from '../models/Users';
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
@@ -7,7 +7,9 @@ import { OAuth2Client } from "google-auth-library";
 import passport from "passport";
 import { Strategy as GitHubStrategy } from "passport-github2";
 
-export const registerUser = async (req: Request, res: Response) => {
+type RouteHandler = (req: Request, res: Response, next?: NextFunction) => Promise<any | void>;
+
+export const registerUser: RouteHandler = async (req: Request, res: Response) => {
     try {
         const { username, email, password } = req.body;
     
@@ -35,7 +37,7 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser: RouteHandler = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
     
@@ -65,7 +67,6 @@ export const loginUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: "An error occured" });
     }
 };
-
 
 export const googleAuth = async (req: Request, res: Response) => {
     try {

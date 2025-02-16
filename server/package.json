@@ -9,8 +9,8 @@
   },
   "keywords": [],
   "author": "GioMjds",
-  "license": "ISC",
-  "description": "REST API with Node.js, Express, and MongoDB for Snippy",
+  "license": "MIT",
+  "description": "REST API with Node.js, Express.js, and MongoDB for Snippy",
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",

@@ -1,20 +1,19 @@
-import { ChangeEvent, FC, FormEvent, useState } from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { motion } from "framer-motion";
+import { ChangeEvent, FC, FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import loginBackground from '../assets/layered-waves-haikei.png';
-import GoogleButton from "../components/buttons/GoogleButton";
-import GitHubButton from "../components/buttons/GitHubButton";
-import { googleClientId, googleRedirectUri } from "../constants/env";
-import { githubOauthUser } from "../constants/env";
+import GitHubButton from "../components/oauth-buttons/GitHubButton";
+import GoogleButton from "../components/oauth-buttons/GoogleButton";
 
 const Login: FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState(null);
   const [errors, setErrors] = useState<{
     email?: string,
     password?: string
@@ -36,17 +35,18 @@ const Login: FC = () => {
     }));
   };
 
-  const handleGoogleLogin = async () => {
-    const scope = 'profile email';
-    const authorizationEndpoint = 'https://accounts.google.com/o/oauth2/auth';
+  const handleGoogleLoginSuccess = (user: any, token: string) => {
+    setLoading(false);
+    setLoginError(null);
+    localStorage.setItem('access_token', token);
+    console.log(`Google login success: ${user}`);
+    navigate('/');
+  };
 
-    const authUrl = `${authorizationEndpoint}?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&scope=${scope}&response_type=code&access_type=offline`;
-
-    window.location.href = authUrl;
-  }
-
-  const handleGitHubLogin = async () => {
-    window.location.assign(`${githubOauthUser}`);
+  const handleGoogleLoginError = (error: any) => {
+    setLoading(false);
+    setLoginError(error);
+    console.error(`Google login error: ${error}`);
   }
 
   return (
@@ -71,7 +71,7 @@ const Login: FC = () => {
           </div>
           <div className="md:w-8/12 lg:w-5/12 lg:ml-20">
             <h1 className="text-5xl my-8 text-center text-indigo-500">Login</h1>
-            <div className="block border border-indigo-700 rounded-xl shadow-xl shadow-indigo-700/50 dark:border dark:border-indigo-700 bg-black/15 p-8 md:py-12 md:mx-12">
+            <div className="block border border-indigo-700 rounded-xl shadow-2xl shadow-indigo-700/50 dark:border dark:border-indigo-700 bg-black/15 p-8 md:py-12 md:mx-12">
               <form onSubmit={handleSubmit}
                 className="min-w-full space-y-4 md:space-y-6"
               >
@@ -120,9 +120,13 @@ const Login: FC = () => {
                   <div className="flex-grow border-t border-gray-300"></div>
                 </div>
                 <div className="flex justify-center gap-3">
-                  <GoogleButton text="Login with Google" onClick={handleGoogleLogin} />
+                  <GoogleButton 
+                    text="Login with Google"
+                    onSuccessLogin={handleGoogleLoginSuccess}
+                    onErrorLogin={handleGoogleLoginError}
+                  />
                   <span className="text-xl text-white">or</span>
-                  <GitHubButton text="Login with GitHub" onClick={handleGitHubLogin} />
+                  <GitHubButton text="Login with GitHub" />
                 </div>
                 <div className="text-center">
                   <button
@@ -135,6 +139,7 @@ const Login: FC = () => {
                   <div className="flex justify-center items-center mt-4">
                     <Link to='/forgot-password' className="text-lg font-medium text-indigo-500 underline hover:text-indigo-600 focus:text-indigo-700 transition duration-200 ease-in-out">Forgot Password?</Link>
                   </div>
+                  {loginError && <p className="text-red-500 text-sm mt-1">{loginError}</p>}
                   <p className="text-xl text-gray-300 mt-2 pt-1 mb-0">Don't have an account? <Link to='/register' className="text-indigo-500 hover:text-indigo-600 focus:text-indigo-600 transition duration-200 ease-in-out">Create New Account</Link></p>
                 </div>
               </form>
