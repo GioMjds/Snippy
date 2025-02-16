@@ -3,9 +3,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import passport from "passport";
-import { connectDB } from './src/config/db';
-import usersRoutes from "./src/routes/usersRoutes";
-import authRoutes from './src/routes/authRoutes';
+import { connectDB } from './config/db';
+import usersRoutes from "./routes/usersRoutes";
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 
