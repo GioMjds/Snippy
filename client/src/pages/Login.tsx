@@ -7,7 +7,8 @@ import { Link } from "react-router-dom";
 import loginBackground from '../assets/layered-waves-haikei.png';
 import GoogleButton from "../components/buttons/GoogleButton";
 import GitHubButton from "../components/buttons/GitHubButton";
-// import { githubOauthUser } from "../constants/env";
+import { googleClientId, googleRedirectUri } from "../constants/env";
+import { githubOauthUser } from "../constants/env";
 
 const Login: FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
@@ -27,7 +28,7 @@ const Login: FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    navigate('/feed');
+    navigate('/');
     setLoading(true);
     setErrors((prev) => ({
       ...prev,
@@ -35,14 +36,18 @@ const Login: FC = () => {
     }));
   };
 
-  // const handleGoogleLogin = async () => {
-  //   // Implement Google login
-  // }
+  const handleGoogleLogin = async () => {
+    const scope = 'profile email';
+    const authorizationEndpoint = 'https://accounts.google.com/o/oauth2/auth';
 
-  // const handleGitHubLogin = async () => {
-  //   // Implement GitHub login
-  //   window.location.assign(`${githubOauthUser}`);
-  // }
+    const authUrl = `${authorizationEndpoint}?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&scope=${scope}&response_type=code&access_type=offline`;
+
+    window.location.href = authUrl;
+  }
+
+  const handleGitHubLogin = async () => {
+    window.location.assign(`${githubOauthUser}`);
+  }
 
   return (
     <section
@@ -115,9 +120,9 @@ const Login: FC = () => {
                   <div className="flex-grow border-t border-gray-300"></div>
                 </div>
                 <div className="flex justify-center gap-3">
-                  <GoogleButton text="Login with Google" />
+                  <GoogleButton text="Login with Google" onClick={handleGoogleLogin} />
                   <span className="text-xl text-white">or</span>
-                  <GitHubButton text="Login with GitHub" />
+                  <GitHubButton text="Login with GitHub" onClick={handleGitHubLogin} />
                 </div>
                 <div className="text-center">
                   <button

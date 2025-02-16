@@ -11,9 +11,9 @@ function App() {
     <>
       <AnimatePresence mode='wait' initial={false}>
         <Routes location={location} key={location.pathname}>
+          <Route path='/' element={<Homepage />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Signup />} /> 
-          <Route path='/feed' element={<Homepage />} />
         </Routes>
       </AnimatePresence>
     </>

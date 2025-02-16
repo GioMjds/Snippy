@@ -11,7 +11,7 @@ const GoogleButton: FC<GoogleButtonProps> = ({ text, onClick }) => {
   return (
     <div className="flex justify-center">
       <button 
-        className="bg-white hover:bg-gray-300 text-black py-2 px-4 rounded-lg transition-all duration-200 ease-in-out"
+        className="bg-white hover:bg-gray-300 text-black py-2 px-4 rounded-lg cursor-pointer transition-all duration-200 ease-in-out"
         type="button"
         onClick={onClick}
       >
