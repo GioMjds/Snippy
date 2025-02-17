@@ -1,114 +1,67 @@
-require("dotenv").config();
-import { NextFunction, Request, Response } from "express";
-import axios from "axios";
-import { OAuth2Client } from "google-auth-library";
-import Users from "../models/Users";
-import jwt from "jsonwebtoken";
+import { Request, Response } from 'express';
+import { createUser, getUserByEmail } from '../models/users';
+import { authentication, random } from '../utils/auth';
+import { IUser } from '../models/users';
 
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const GITHUB_API_USER = process.env.GITHUB_API_USER as string;
-const GITHUB_LOGIN_OAUTH = process.env.GITHUB_LOGIN_OAUTH;
+type RouteHandler = (req: Request, res: Response) => void;
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const JWT_SECRET = process.env.JWT_SECRET as string;
-
-const client = new OAuth2Client(GOOGLE_CLIENT_ID);
-
-type RouteHandler = (req: Request, res: Response, next?: NextFunction) => Promise<any | void>;
-
-export const googleFrontendCallback: RouteHandler = async (req, res) => {
+export const login: RouteHandler = async (req: Request, res: Response) => {
     try {
-        const { credential } = req.body;
+        const { email, password } = req.body;
 
-        if (!credential) return res.status(400).json({ error: "Missing Google ID token" });
+        if (!email || !password) return res.sendStatus(400);
 
-        const ticket = await client.verifyIdToken({
-            idToken: credential,
-            audience: GOOGLE_CLIENT_ID,
-        });
-        const payload = ticket.getPayload();
+        const user: IUser | null = await getUserByEmail(email).select('+authentication.salt +authentication.password');
 
-        if (!payload?.email_verified) return res.status(400).json({ error: "Google Email not verified" });
+        if (!user) return res.status(400).json({ error: "User not found." });
 
-        const googleId = payload.sub;
-        const email = payload.email as string;
-        const username = payload.name as string;
+        const expectedHash = authentication(user.authentication?.salt || "", password);
 
-        let user = await Users.findOne({ googleId: googleId });
+        if (user.authentication?.password !== expectedHash) return res.status(403).json({ error: "Incorrect password." });
 
-        if (!user) {
-            const newUser = new Users({
-                googleId: googleId,
-                username: username,
-                email: email,
-                password: undefined,
-            });
-            user = await newUser.save();
-        }
+        const salt = random();
+        user.authentication.sessionToken = authentication(salt, user._id.toString());
 
-        if (!user) return res.status(400).json({ error: "User not found" });
+        await user.save();
 
-        const token = jwt.sign({ id: user._id }, JWT_SECRET, {
-            expiresIn: '1h',
+        res.cookie('session_token', user.authentication.sessionToken, {
+            domain: 'localhost',
+            path: '/',
         });
 
-        return res.status(200).json({
-            token,
-            user: {
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-            }
-        });
-    } catch (error: any) {
-        console.error(`Error in /auth/google/frontend-callback: ${error}`);
-        return res.status(500).json({ error: "Google authentication failed", details: error.message });
-    }
-};
-
-export const getAccessTokenGitHub = async (req: Request, res: Response) => {
-    try {
-        const code = req.query.code as string;
-        console.log(`Authorization Code: ${code}`);
-
-        if (!code) res.status(400).json({ error: "Missing authorization code" });
-
-        const params = new URLSearchParams({
-            client_id: GITHUB_CLIENT_ID as string,
-            client_secret: GITHUB_CLIENT_SECRET as string,
-            code: code,
-        });
-
-        const response = await axios.post(`${GITHUB_LOGIN_OAUTH}`, params, {
-            headers: {
-                "Accept": 'application/json',
-            }
-        });
-
-        console.log(`Access Token Data: ${response.data}`);
-        res.status(200).json(response.data);
+        return res.status(200).json(user).end();
     } catch (error) {
-        console.error(`Error in /auth/getAccessTokenGitHub: ${error}`);
-        res.status(500).json({ error: "An error occured" });
+        console.error(`Error logging in: ${error}`);
+        return res.status(400);
     }
-};
+}
 
-export const getGitHubUserData = async (req: Request, res: Response) => {
+export const register: RouteHandler = async (req: Request, res: Response) => {
     try {
-        const authorization = req.get("Authorization");
+        const { username, email, password } =  req.body;
 
-        if (!authorization) return res.status(401).json({ error: "Missing authorization header" });
+        // Check if user exists
+        if (!email || !password || !username) {
+            return res.sendStatus(400);
+        };
 
-        const response = await axios.get(GITHUB_API_USER, {
-            headers: {
-                "Authorization": authorization,
+        const existingUser = await getUserByEmail(email);
+
+        if (existingUser) return res.status(400).json({ message: 'User already exists' }).end();
+
+        const salt = random();
+        const user = await createUser({
+            email,
+            username,
+            authentication: {
+                salt,
+                password: authentication(salt, password),
             }
         });
-        console.log(`User Data: ${response.data}`);
-        return res.status(200).json(response.data);
+
+        return res.status(200).json(user).end();
     } catch (error) {
-        console.error(`Error in /auth/getUserData: ${error}`);
-        return res.status(500).json({ error: "An error occured" });
+        console.error(error);
+        return res.status(400).end();
     }
-};
+}

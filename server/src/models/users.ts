@@ -1,11 +1,14 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IUser extends Document {
-    username?: string;
-    email?: string;
-    password?: string;
-    googleId?: string;
-    githubId?: string;
+export interface IUser {
+    [x: string]: any;
+    username: string;
+    email: string;
+    authentication?: {
+        salt: string;
+        password: string;
+        sessionToken?: string;
+    }
 }
 
 const UserSchema: Schema = new Schema({
@@ -24,20 +27,32 @@ const UserSchema: Schema = new Schema({
         lowercase: true,
         unique: [true, 'Email is already in use'],
     },
-    password: {
-        type: String,
-        required: false,
+    authentication: {
+        password: {
+            type: String,
+            required: [true, 'Password is required'],
+            select: false,
+            minLength: [8, 'Password must be at least 8 characters long']
+        },
+        salt: {
+            type: String,
+            select: false,
+        },
+        sessionToken: {
+            type: String,
+            select: false,
+        },
     },
-    googleId: {
-        type: String,
-        unique: true,
-        sparse: true
-    },
-    githubId: {
-        type: String,
-        unique: true,
-        sparse: true
-    }
 }, { timestamps: true });
 
-export default mongoose.model<IUser>('User', UserSchema);
+export const User = mongoose.model<IUser>('User', UserSchema);
+
+// Model abstract functions
+
+export const getUsers = () => User.find();
+export const getUserByEmail = (email: string) => User.findOne({ email });
+export const getUserBySessionToken = (sessionToken: string) => User.findOne({ 'authentication.sessionToken': sessionToken });
+export const getUserById = (id: string) => User.findById(id);
+export const createUser = (values: Record<string, any>) => new User(values).save().then((user) => user.toObject());
+export const updateUserById = (id: string, values: Record<string, any>) => User.findByIdAndUpdate(id, values, { new: true });
+export const deleteUserById = (id: string) => User.findByIdAndDelete({ _id: id });

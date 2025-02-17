@@ -1,17 +1,12 @@
 import { Router } from "express";
 import { 
-    getAccessTokenGitHub, 
-    getGitHubUserData, 
-    googleFrontendCallback,
+    login, 
+    register 
 } from "../controllers/authController";
 
 const router = Router();
 
-// GitHub OAuth Routes
-router.get('/getAccessTokenGitHub', getAccessTokenGitHub);
-// router.get('/getGitHubUserData', getGitHubUserData);
-
-// Google OAuth Routes
-router.post('/google/frontend-callback', googleFrontendCallback);
+router.post('/register', register);
+router.post('/login', login);
 
 export default router;

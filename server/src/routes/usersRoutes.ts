@@ -1,19 +1,9 @@
-import { Router } from 'express';
-import { 
-    loginUser, 
-    registerUser, 
-    githubAuthCallback, 
-    githubAuth,
-    googleAuth, 
-    githubAuthSuccess
-} from '../controllers/usersController';
+import { Router } from "express";
+import { getAllUsers } from "../controllers/usersController";
+import { isAuthenticated } from "../middlewares/middleware";
 
 const router = Router();
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
-router.post('/google', googleAuth);
-router.get('/github', githubAuth);
-router.get('/github/callback', githubAuthCallback, githubAuthSuccess);
+router.get('/', isAuthenticated, getAllUsers);
 
 export default router;

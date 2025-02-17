@@ -7,7 +7,7 @@ const API = axios.create({
 
 export const handleLogin = async (email: string, password: string) => {
     try {
-        const response = await API.post('/users/login', {
+        const response = await API.post('/auth/login', {
                 email: email, 
                 password: password 
             }, {
@@ -22,6 +22,25 @@ export const handleLogin = async (email: string, password: string) => {
         throw error;
     }
 };
+
+export const handleRegister = async (username: string, email: string, password: string, confirmPassword: string) => {
+    try {
+        const response = await API.post('/auth/register', {
+            username: username,
+            email: email.toLowerCase(),
+            password: password,
+            confirmPassword: confirmPassword,
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error(`Error during registration: ${error}`);
+        throw error;
+    }
+}
 
 export const getGitHubUserData = async () => {
     try {
