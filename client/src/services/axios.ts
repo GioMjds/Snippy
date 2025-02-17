@@ -13,7 +13,8 @@ export const handleLogin = async (email: string, password: string) => {
             }, {
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                withCredentials: true
             }
         );
         return response;
@@ -23,13 +24,12 @@ export const handleLogin = async (email: string, password: string) => {
     }
 };
 
-export const handleRegister = async (username: string, email: string, password: string, confirmPassword: string) => {
+export const handleRegister = async (username: string, email: string, password: string) => {
     try {
         const response = await API.post('/auth/register', {
             username: username,
-            email: email.toLowerCase(),
+            email: email,
             password: password,
-            confirmPassword: confirmPassword,
         }, {
             headers: {
                 'Content-Type': 'application/json'

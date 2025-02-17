@@ -21,9 +21,9 @@ export const getAccessToken = async (codeParam: string) => {
             }
         });
         console.log(response.data);
-        if (response.data.access_token) {
+        if (response.data.accessToken) {
             localStorage.setItem("access_token", response.data.access_token);
-            return response.data.access_token;
+            return response.data.accessToken;
         } else {
             console.error("No access token received from server");
             return null;
@@ -46,7 +46,7 @@ export const refreshUserToken = async () => {
     try {
         const response = await axios.post(`${apiUrl}/refresh`, { refresh: refreshToken });
         if (response.status === 200) {
-            localStorage.setItem("access_token", response.data.access);
+            localStorage.setItem("access_token", response.data.accessToken);
             return true;
         }
         return false;

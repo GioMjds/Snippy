@@ -1,7 +1,20 @@
 import mongoose, { Schema } from "mongoose";
 
+interface ISnippet {
+    [x: string]: any;
+    authorId: Schema.Types.ObjectId;
+    title: string;
+    description?: string;
+    code?: string;
+    tags?: string[];
+    creationDate?: Date;
+    updatedDate?: Date;
+    upvoteCount?: number;
+    downvoteCount?: number;
+    commentCount?: number;
+}
+
 const SnippetSchema = new Schema({
-    _id: Schema.Types.ObjectId,
     authorId: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -16,11 +29,9 @@ const SnippetSchema = new Schema({
     },
     description: {
         type: String,
-        maxLength: [500, 'Description must be at most 500 characters long'],
     },
     code: {
         type: String,
-        required: [true, 'Code is required'],
     },
     tags: [{
         type: String,
@@ -35,13 +46,18 @@ const SnippetSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    license: {
-        type: String,
-        maxLength: [100, 'License must be at most 100 characters long'],
-    },
     upvoteCount: { type: Number, default: 0 },
     downvoteCount: { type: Number, default: 0 },
     commentCount: { type: Number, default: 0 },
 });
 
-export default mongoose.model('Snippets', SnippetSchema);
+export const Snippets = mongoose.model<ISnippet>('Snippet', SnippetSchema);
+
+// Snippet abstract functions
+
+export const fetchAllSnippets = () => Snippets.find();
+export const viewSnippetPost = (id: string) => Snippets.findById(id);
+export const createSnippetPost = (values: Record<string, any>) => new Snippets(values).save().then((snippet) => snippet.toObject());
+export const updateSnippetPost = (id: string, values: Record<string, any>) => Snippets.findByIdAndUpdate(id, values, { new: true });
+export const deleteSnippetPost = (id: string) => Snippets.findByIdAndDelete({ _id: id });
+export const shareSnippetPost = (id: string) => Snippets.findById(id).select('+authorId').populate('authorId', 'username email');

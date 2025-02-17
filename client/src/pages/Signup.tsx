@@ -54,7 +54,7 @@ const Signup: FC = () => {
     if (hasErrors) return;
 
     try {
-      const response = await handleRegister(username, email, password, confirmPassword);
+      const response = await handleRegister(username, email, password);
       if (response.data.success) {
         const userData = { username, email, password };
         Object.entries(userData).forEach(([key, value]) => {

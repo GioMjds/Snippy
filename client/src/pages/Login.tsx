@@ -18,7 +18,8 @@ const Login: FC = () => {
   const [loginError, setLoginError] = useState(null);
   const [errors, setErrors] = useState<{
     email?: string,
-    password?: string
+    password?: string,
+    general?: string,
   }>({});
   const navigate = useNavigate();
   const { setIsAuthenticated } = useUserContext();
@@ -31,13 +32,14 @@ const Login: FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setLoginError(null);
     setLoading(true);
 
     try {
       const response = await handleLogin(email, password);
       if (response.status === 200) {
-        localStorage.setItem('session_token', response.data.sessionToken);
         localStorage.setItem('access_token', response.data.accessToken);
+        localStorage.setItem('session_token', response.data.sessionToken);
         navigate('/');
         setIsAuthenticated(true);
       }

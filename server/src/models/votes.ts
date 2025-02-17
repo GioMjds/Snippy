@@ -1,7 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 
+interface IVote {
+    [x: string]: any;
+    userId: Schema.Types.ObjectId;
+    snippetId: Schema.Types.ObjectId;
+    voteType: string;
+    voteValue: number;
+    voteDate?: Date;
+}
+
 const VoteSchema = new Schema({
-    _id: Schema.Types.ObjectId,
     userId: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -27,4 +35,11 @@ const VoteSchema = new Schema({
     }
 });
 
-export default mongoose.model('Votes', VoteSchema);
+export const Votes = mongoose.model<IVote>('Votes', VoteSchema);
+
+// Vote abstract functions
+
+export const fetchAllVotes = () => Votes.find();
+export const fetchVotesBySnippetId = (snippetId: string) => Votes.find({ snippetId });
+export const upvoteSnippet = (userId: string, snippetId: string) => new Votes({ userId, snippetId, voteType: 'upvote', voteValue: 1 }).save().then((vote) => vote.toObject());
+export const downvoteSnippet = (userId: string, snippetId: string) => new Votes({ userId, snippetId, voteType: 'downvote', voteValue: -1 }).save().then((vote) => vote.toObject());

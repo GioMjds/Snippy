@@ -23,7 +23,7 @@ app.use(cors({
 
 const server = http.createServer(app);
 
-app.use('/', usersRoutes);
+app.use('/users', usersRoutes);
 app.use('/auth', authRoutes);
 
 connectDB();

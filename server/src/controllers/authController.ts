@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { Request, Response } from 'express';
 import { createUser, getUserByEmail } from '../models/users';
 import { authentication, random } from '../utils/auth';
@@ -27,22 +28,31 @@ export const login: RouteHandler = async (req: Request, res: Response) => {
         res.cookie('session_token', user.authentication.sessionToken, {
             domain: 'localhost',
             path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
         });
 
-        return res.status(200).json(user).end();
+        return res.status(200).json({
+            message: "Login Successful",
+            user: { 
+                username: user.username, 
+                email: user.email,
+                id: user._id
+            }
+        }).end();
     } catch (error) {
         console.error(`Error logging in: ${error}`);
-        return res.status(400);
+        return res.status(400).json({ error: error });
     }
-}
+};
 
 export const register: RouteHandler = async (req: Request, res: Response) => {
     try {
         const { username, email, password } =  req.body;
 
-        // Check if user exists
         if (!email || !password || !username) {
-            return res.sendStatus(400);
+            return res.status(400).json({  error: "Missing required fields" });
         };
 
         const existingUser = await getUserByEmail(email);
@@ -64,4 +74,4 @@ export const register: RouteHandler = async (req: Request, res: Response) => {
         console.error(error);
         return res.status(400).end();
     }
-}
+};
