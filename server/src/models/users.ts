@@ -51,8 +51,11 @@ export const User = mongoose.model<IUser>('User', UserSchema);
 
 export const getUsers = () => User.find();
 export const getUserByEmail = (email: string) => User.findOne({ email });
-export const getUserBySessionToken = (sessionToken: string) => User.findOne({ 'authentication.sessionToken': sessionToken });
 export const getUserById = (id: string) => User.findById(id);
 export const createUser = (values: Record<string, any>) => new User(values).save().then((user) => user.toObject());
 export const updateUserById = (id: string, values: Record<string, any>) => User.findByIdAndUpdate(id, values, { new: true });
 export const deleteUserById = (id: string) => User.findByIdAndDelete({ _id: id });
+export const getUserBySessionToken = (sessionToken: string) => {
+    console.log(`Searching for user with session token: ${User.findOne({ 'authentication.sessionToken': sessionToken })}`);
+    return User.findOne({ 'authentication.sessionToken': sessionToken });
+}

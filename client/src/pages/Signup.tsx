@@ -186,8 +186,8 @@ const Signup: FC = () => {
                     <label htmlFor="password" className="block text-indigo-500 text-2xl mb-2">Confirm Password</label>
                     <input
                       type={passwordVisible ? 'text' : 'password'}
-                      name="password"
-                      id="password"
+                      name="confirm_password"
+                      id="confirm_password"
                       value={confirmPassword}
                       onChange={handleConfirmPasswordChange}
                       placeholder="Enter your password"

@@ -38,8 +38,6 @@ const Login: FC = () => {
     try {
       const response = await handleLogin(email, password);
       if (response.status === 200) {
-        localStorage.setItem('access_token', response.data.accessToken);
-        localStorage.setItem('session_token', response.data.sessionToken);
         navigate('/');
         setIsAuthenticated(true);
       }

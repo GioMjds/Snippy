@@ -29,8 +29,8 @@ export const login: RouteHandler = async (req: Request, res: Response) => {
             domain: 'localhost',
             path: '/',
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: false,
+            sameSite: 'lax',
         });
 
         return res.status(200).json({
@@ -69,9 +69,34 @@ export const register: RouteHandler = async (req: Request, res: Response) => {
             }
         });
 
+        res.cookie('session_token', {
+            domain: 'localhost',
+            path: '/',
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+        })
+
         return res.status(200).json(user).end();
     } catch (error) {
         console.error(error);
         return res.status(400).end();
+    }
+};
+
+export const logout: RouteHandler = async (req: Request, res: Response) => {
+    try {
+        res.clearCookie('session_token', {
+            domain: 'localhost',
+            path: '/',
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+        });
+        return res.status(200).json({ message: "Logged out" }).end();
+    } catch (error) {
+        console.error(`Error logging out: ${error}`);
+        return res.status(400).json({ error: error });
     }
 };
