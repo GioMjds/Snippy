@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom"
 import Feed from "../layouts/Feed"
-import LeftSidebar from "../layouts/LeftSidebar"
 import Navbar from "../layouts/Navbar"
 import RightFooter from "../layouts/RightFooter"
 import { handleLogout } from "../services/axios"
+import PostForm from "../components/PostForm"
 
 const Homepage = () => {
   const navigate = useNavigate();
@@ -12,7 +12,6 @@ const Homepage = () => {
       const response = await handleLogout();
       if (response.status === 200) {
         console.log("Log out successful");
-        sessionStorage.removeItem('session_token');
         navigate('/login');
       } else {
         console.error("Log out failed");
@@ -25,7 +24,7 @@ const Homepage = () => {
   return (
     <>
       <Navbar />
-      <LeftSidebar />
+      <PostForm />
       <Feed />
       <RightFooter />
       <button 

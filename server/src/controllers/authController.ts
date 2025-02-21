@@ -1,10 +1,10 @@
 require('dotenv').config();
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { createUser, getUserByEmail } from '../models/users';
 import { authentication, random } from '../utils/auth';
 import { IUser } from '../models/users';
 
-type RouteHandler = (req: Request, res: Response) => void;
+type RouteHandler = (req: Request, res: Response, next?: NextFunction) => void;
 
 export const login: RouteHandler = async (req: Request, res: Response) => {
     try {
