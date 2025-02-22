@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 interface PostFormProps {
   userProfileImage?: string;
-  onStartPostClick: () => void;
+  onStartPostClick?: () => void;
 }
 
 const PostForm: FC<PostFormProps> = ({ userProfileImage, onStartPostClick }) => {
